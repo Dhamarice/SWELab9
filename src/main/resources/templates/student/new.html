@@ -22,7 +22,7 @@
     <div class="collapse navbar-collapse" id="navbarColor01">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item" style="border-left: white 1px solid; padding-left: 2em; padding-right: 2em;">
-                <a class="nav-link" href="/elibrary/book/list">Students</a>
+                <a class="nav-link" href="/student/list">Students</a>
             </li>
         </ul>
         <form class="form-inline my-2 my-lg-0">
@@ -36,7 +36,7 @@
 
 <div style="padding-top:1em;" class="container">
     <div style="margin-bottom: 1em;">
-        <span style="font-size: 2em; color: #32a5e7;">New Student Form</span>
+        <span style="font-size: 2em; color: green;">New Student Form</span>
     </div>
 
     <form id="newStudentForm" method="post" action="/addstudent" th:object="${student}">
@@ -113,6 +113,7 @@
                         </select>
                     </div>
                 </div>
+            </div>
             <div style="float:right;">
                 <a href="/student/list" class="btn btn-outline-warning">Cancel</a>&nbsp;&nbsp;&nbsp;
                 <button id="btnSubmit" type="submit" class="btn btn-outline-success">Save Student</button>

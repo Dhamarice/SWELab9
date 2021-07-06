@@ -5,13 +5,11 @@ import edu.miu.cs.cs425.eregistrar.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 public class StudentController {
@@ -43,51 +41,69 @@ public class StudentController {
             return modelAndView;
         }
         studentService.saveStudent(student);
-        modelAndView.setViewName("index");
+        modelAndView.addObject("students", studentService.findAllStudents());
+        modelAndView.addObject("studentCount",studentService.countStudent());
+        modelAndView.setViewName("student/list");
         return modelAndView;
 
     }
 
-
-//    @GetMapping("/student/list")
-//    public String showStudentList(Model model){
-//        model.addAttribute("students", studentService.findAllStudents());
-//        return "studentlist";
-//    }
 
     @GetMapping("/student/list")
     public ModelAndView showStudentList(Model model){
         ModelAndView modelAndView = new ModelAndView();
         model.addAttribute("students", studentService.findAllStudents());
+        modelAndView.addObject("studentCount",studentService.countStudent());
         modelAndView.setViewName("/student/list");
         return modelAndView;
     }
 
 @GetMapping("/student/edit/{id}")
-    public String showUpdateForm(@PathVariable("id") long id, Model model){
+    public ModelAndView showUpdateForm(@PathVariable("id") long id){
         Student student = studentService.findStudent(id);
-        model.addAttribute("student", student);
-        return "update-student";
+    ModelAndView modelAndView = new ModelAndView();
+    modelAndView.setViewName("/student/edit");
+    modelAndView.addObject("student",student);
+        return modelAndView;
 }
 
-@PostMapping("/update/{id}")
-    public String updateStudent(@PathVariable("id") long id, @Valid Student student, BindingResult result, Model model){
-
+@PostMapping("/update")
+    public ModelAndView updateStudent(@Valid @ModelAttribute("student") Student student, BindingResult result){
+    ModelAndView modelAndView = new ModelAndView();
         if(result.hasErrors()){
-            student.setStudentId(id);
-            return "update-student";
+            modelAndView.setViewName("/student/edit");
+            modelAndView.addObject("student", student);
+            return modelAndView;
         }
         studentService.saveStudent(student);
-        return "redirect:/index";
+    modelAndView.addObject("students", studentService.findAllStudents());
+    modelAndView.addObject("studentCount",studentService.countStudent());
+    modelAndView.setViewName("/student/list");
+    return modelAndView;
 }
 
-@GetMapping("delete/{id}")
-    public String deleteStudent(@PathVariable("id") long id, Model model){
+@GetMapping("student/delete/{id}")
+    public ModelAndView deleteStudent(@PathVariable("id") long id){
         Student student = studentService.findStudent(id);
-
         studentService.deleteStudent(student);
-        return "redirect:/index";
+    ModelAndView modelAndView = new ModelAndView();
+    modelAndView.addObject("students", studentService.findAllStudents());
+    modelAndView.addObject("studentCount",studentService.countStudent());
+    modelAndView.setViewName("/student/list");
+    return modelAndView;
 }
 
+//student/search?searchString=ruv
+
+    @GetMapping(value = {"/student/search", "/student/search"})
+    public ModelAndView searchStudents(@RequestParam String searchString) {
+        ModelAndView modelAndView = new ModelAndView();
+        List<Student> students = studentService.searchStudent(searchString);
+        modelAndView.addObject("students", students);
+        modelAndView.addObject("searchString", searchString);
+        modelAndView.addObject("studentCount", students.size());
+        modelAndView.setViewName("student/list");
+        return modelAndView;
+    }
 
 }
